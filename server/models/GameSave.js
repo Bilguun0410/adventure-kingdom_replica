@@ -40,6 +40,15 @@ const tileSchema = new mongoose.Schema(
   { _id: false },
 );
 
+// ── Fog-of-war tile (sparse — only cleared tiles are stored) ─
+const fogTileSchema = new mongoose.Schema(
+  {
+    x: { type: Number, required: true },
+    y: { type: Number, required: true },
+  },
+  { _id: false },
+);
+
 // ── Main save document ────────────────────────────────────────
 const gameSaveSchema = new mongoose.Schema(
   {
@@ -71,6 +80,9 @@ const gameSaveSchema = new mongoose.Schema(
 
     // Placed buildings
     buildings: { type: [buildingSchema], default: [] },
+
+    // Fog-of-war cleared tiles (sparse)
+    fog: { type: [fogTileSchema], default: [] },
 
     savedAt: { type: Date, default: Date.now },
   },

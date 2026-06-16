@@ -43,6 +43,7 @@
       }
 
       #app {
+        position: relative;
         display: flex;
         flex-direction: column;
         width: 450px;
@@ -119,6 +120,62 @@
         display: block;
       }
 
+      /* ── Overlay UI ───────────────────────────────────────── */
+      #ui-overlay {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 24px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+      }
+      #info-box {
+        background: rgba(26, 10, 0, 0.82);
+        border: 2px solid #c8a050;
+        color: #f7f4eb;
+        font-size: 5px;
+        line-height: 1.8;
+        padding: 6px 8px;
+        min-height: 54px;
+        pointer-events: auto;
+      }
+      #build-palette {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        pointer-events: auto;
+      }
+      .build-btn,
+      .action-btn {
+        background: linear-gradient(180deg, #ffdd60 0%, #f0a800 60%, #d08800 100%);
+        border: 2px solid #4a2e1b;
+        border-radius: 3px;
+        color: #2a1a0a;
+        padding: 4px 5px;
+        cursor: pointer;
+        font-family: "Press Start 2P", monospace;
+        font-size: 5px;
+        box-shadow: 2px 2px 0 #4a2e1b;
+      }
+      .build-btn:hover,
+      .action-btn:hover {
+        background: linear-gradient(180deg, #ffea70 0%, #f8c020 60%, #e09800 100%);
+      }
+      .build-btn.active {
+        background: linear-gradient(180deg, #ff9840 0%, #e06010 60%, #c04000 100%);
+        color: #fff8e7;
+        border-color: #2a1a0a;
+      }
+      .action-btn.demolish {
+        background: linear-gradient(180deg, #ff9090 0%, #c02020 100%);
+        color: #fff8e7;
+        border-color: #7b0000;
+      }
+
       /* ── Bottom bar ───────────────────────────────────────── */
       #bottombar {
         background: linear-gradient(180deg, #e8d09a 0%, #c8a050 100%);
@@ -132,6 +189,10 @@
         align-items: center;
         flex-shrink: 0;
         box-shadow: inset 0 2px 0 #f0d880;
+      }
+      #mode-disp {
+        color: #7b1c00;
+        margin-left: auto;
       }
     </style>
   </head>
@@ -147,12 +208,95 @@
       <!-- Phaser injects its canvas here -->
       <div id="game-canvas"></div>
 
+      <div id="ui-overlay">
+        <div id="info-box">
+          Select a building below, tap a tile to place, or tap Explore to inspect.
+        </div>
+        <div id="build-palette">
+          <button class="action-btn" id="save-btn">💾 Save</button>
+          <button class="action-btn" id="load-btn">📂 Load</button>
+          <button class="action-btn demolish" id="demolish-btn">🔨 Demolish</button>
+          <button class="action-btn" id="cancel-btn">✖ Cancel</button>
+        </div>
+      </div>
+
       <div id="bottombar">
         <span>Drag to pan</span>
         <span>Tap tile for grid coords</span>
+        <span id="mode-disp">Mode: Explore</span>
       </div>
     </div>
 
     <script type="module" src="src/engine/main.js"></script>
+
+    <!-- Overlay UI wiring -->
+    <script type="module">
+      import { BDEF, BUILDING_TYPES } from './src/engine/data/buildings.js';
+
+      const palette = document.getElementById('build-palette');
+
+      BUILDING_TYPES.forEach((type) => {
+        const d = BDEF[type];
+        const btn = document.createElement('button');
+        btn.className = 'build-btn';
+        btn.dataset.type = type;
+        btn.innerHTML = `${d.name}<br><small>${d.cost}g</small>`;
+        btn.addEventListener('click', () => {
+          window.dispatchEvent(new CustomEvent('build-select', { detail: type }));
+        });
+        palette.insertBefore(btn, palette.firstChild);
+      });
+
+      document.getElementById('demolish-btn')
+        .addEventListener('click', () => window.dispatchEvent(new CustomEvent('demolish-toggle')));
+      document.getElementById('cancel-btn')
+        .addEventListener('click', () => window.dispatchEvent(new CustomEvent('cancel-build')));
+      document.getElementById('save-btn')
+        .addEventListener('click', () => window.dispatchEvent(new CustomEvent('save-game')));
+      document.getElementById('load-btn')
+        .addEventListener('click', () => window.dispatchEvent(new CustomEvent('load-game')));
+
+      // Reflect mode changes in the UI
+      window.addEventListener('mode-change', (e) => {
+        document.getElementById('mode-disp').textContent = 'Mode: ' + e.detail;
+        document.querySelectorAll('.build-btn').forEach((b) => {
+          b.classList.toggle('active', b.dataset.type === e.detail.replace('Place ', ''));
+        });
+      });
+
+      // Reflect resource changes
+      window.addEventListener('resources-change', (e) => {
+        document.getElementById('res-gold').textContent = Math.floor(e.detail.gold);
+        // Affordability tint
+        document.querySelectorAll('.build-btn').forEach((b) => {
+          const type = b.dataset.type;
+          const cost = BDEF[type]?.cost ?? 0;
+          b.style.opacity = e.detail.gold >= cost ? '1' : '0.55';
+        });
+      });
+
+      // Inspect a building
+      window.addEventListener('building-info', (e) => {
+        const box = document.getElementById('info-box');
+        if (!e.detail) {
+          box.textContent = 'Tap a building to inspect it.';
+          return;
+        }
+        const d = e.detail;
+        box.innerHTML = `
+          <span style="color:#f0c060">${d.name}</span> — ${d.desc}<br>
+          Cost: ${d.cost === 0 ? 'FREE' : d.cost + 'g'}<br>
+          Produces: ${d.prod || 'None'}<br>
+          ${d.pop ? `+${d.pop} max pop<br>` : ''}
+          ${d.hap ? `+${d.hap} happiness<br>` : ''}
+          <span style="color:#888">Tile ${d.tile}</span>
+        `;
+      });
+
+      // In-game log
+      window.addEventListener('game-log', (e) => {
+        console.log(`[${e.detail.type}] ${e.detail.msg}`);
+      });
+    </script>
   </body>
 </html>

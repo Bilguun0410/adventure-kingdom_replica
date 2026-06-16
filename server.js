@@ -32,6 +32,7 @@ mongoose.connect(MONGO_URI)
 
 // ── Mount routes ──────────────────────────────────────────────
 app.use('/api/saves',     require('./server/routes/saves'));
+app.use('/api/save-map',  require('./server/routes/saveMap'));
 app.use('/api/residents', require('./server/routes/residents'));
 app.use('/api/inventory', require('./server/routes/inventory'));
 
