@@ -1,4 +1,5 @@
-import Phaser from 'phaser';
+import * as Phaser from "phaser";
+
 import {
   TILE_WIDTH,
   TILE_HEIGHT,
@@ -6,12 +7,12 @@ import {
   cartToIso,
   isoToCart,
   clamp,
-} from '../utils/iso.js';
+} from "../utils/iso.js";
 
 const TERRAIN = {
-  DIRT:  { key: 'dirt',  color: 0xB59263 },
-  GRASS: { key: 'grass', color: 0x4CA64C },
-  WATER: { key: 'water', color: 0x1D70B8 },
+  DIRT: { key: "dirt", color: 0xb59263 },
+  GRASS: { key: "grass", color: 0x4ca64c },
+  WATER: { key: "water", color: 0x1d70b8 },
 };
 
 /**
@@ -23,12 +24,12 @@ const TERRAIN = {
  */
 export class GameScene extends Phaser.Scene {
   constructor() {
-    super({ key: 'GameScene' });
+    super({ key: "GameScene" });
   }
 
   /* ── Preload: generate placeholder iso diamond textures ─────────────── */
   preload() {
-    this._createIsoTexture(TERRAIN.DIRT.key,  TERRAIN.DIRT.color);
+    this._createIsoTexture(TERRAIN.DIRT.key, TERRAIN.DIRT.color);
     this._createIsoTexture(TERRAIN.GRASS.key, TERRAIN.GRASS.color);
     this._createIsoTexture(TERRAIN.WATER.key, TERRAIN.WATER.color);
   }
@@ -97,7 +98,7 @@ export class GameScene extends Phaser.Scene {
         const sprite = this.add.sprite(sx, sy, terrain);
         sprite.setOrigin(0.5, 0.5);
         sprite.setDepth(sy);
-        sprite.setData('grid', { x, y });
+        sprite.setData("grid", { x, y });
 
         this.tileSprites.push(sprite);
       }
@@ -110,8 +111,8 @@ export class GameScene extends Phaser.Scene {
     const halfH = TILE_HEIGHT / 2;
 
     // World-space bounds that contain the whole iso map
-    const minIso  = cartToIso(0, MAP_SIZE - 1);         // top-left-most
-    const maxIso  = cartToIso(MAP_SIZE - 1, 0);         // top-right-most
+    const minIso = cartToIso(0, MAP_SIZE - 1); // top-left-most
+    const maxIso = cartToIso(MAP_SIZE - 1, 0); // top-right-most
     const maxYIso = cartToIso(MAP_SIZE - 1, MAP_SIZE - 1); // bottom-most
 
     const boundsX = minIso.x - halfW;
@@ -122,7 +123,7 @@ export class GameScene extends Phaser.Scene {
     camera.setBounds(boundsX, boundsY, boundsW, boundsH);
     camera.centerOn(0, maxYIso.y / 2);
     camera.setZoom(1);
-    camera.setBackgroundColor('#1c0e05');
+    camera.setBackgroundColor("#1c0e05");
   }
 
   /* ── Input: drag-to-pan + clean tap-to-select ───────────────────────── */
@@ -131,20 +132,20 @@ export class GameScene extends Phaser.Scene {
     this.dragThreshold = 6;
     this.lastPointer = { x: 0, y: 0 };
 
-    this.input.on('pointerdown', (pointer) => {
+    this.input.on("pointerdown", (pointer) => {
       this.isDragging = false;
       this.lastPointer.x = pointer.x;
       this.lastPointer.y = pointer.y;
     });
 
-    this.input.on('pointermove', (pointer) => {
+    this.input.on("pointermove", (pointer) => {
       if (!pointer.isDown) return;
 
       const dist = Phaser.Math.Distance.Between(
         pointer.downX,
         pointer.downY,
         pointer.x,
-        pointer.y
+        pointer.y,
       );
 
       if (dist > this.dragThreshold) {
@@ -164,7 +165,7 @@ export class GameScene extends Phaser.Scene {
       }
     });
 
-    this.input.on('pointerup', (pointer) => {
+    this.input.on("pointerup", (pointer) => {
       if (!this.isDragging) {
         this._handleTileTap(pointer);
       }
@@ -184,7 +185,7 @@ export class GameScene extends Phaser.Scene {
     const gy = clamp(cart.y, 0, MAP_SIZE - 1);
 
     console.log(
-      `Tile tapped → grid[${gx}, ${gy}] terrain=${this.mapData[gy][gx]}`
+      `Tile tapped → grid[${gx}, ${gy}] terrain=${this.mapData[gy][gx]}`,
     );
   }
 }

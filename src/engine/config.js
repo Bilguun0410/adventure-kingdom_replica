@@ -1,22 +1,22 @@
-import Phaser from 'phaser';
-import { GameScene } from './scenes/GameScene.js';
+import { Game, AUTO, Scene, Scale } from "phaser";
+import { GameScene } from "./scenes/GameScene.js";
 
 /**
  * Returns a Phaser 3 game configuration tuned for a vertical portrait
  * container (450×800) with FIT scaling.
  */
-export function createGameConfig(parentId = 'game-canvas') {
+export function createGameConfig(parentId = "game-canvas") {
   return {
-    type: Phaser.AUTO,
+    type: AUTO,
     width: 450,
     height: 800,
     parent: parentId,
-    backgroundColor: '#1c0e05',
+    backgroundColor: "#1c0e05",
     pixelArt: true,
 
     scale: {
-      mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      mode: Scale.FIT,
+      autoCenter: Scale.CENTER_BOTH,
     },
 
     scene: [GameScene],

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>⚔️ Adventure Kingdom — Phaser Engine</title>
+
+    <!-- Phaser 3 ESM build from jsDelivr -->
+    <script type="importmap">
+      {
+        "imports": {
+          "phaser": "https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.esm.min.js"
+        }
+      }
+    </script>
+
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        background: #1c0e05;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: "Press Start 2P", monospace;
+        image-rendering: pixelated;
+        -webkit-font-smoothing: none;
+      }
+
+      #app {
+        display: flex;
+        flex-direction: column;
+        width: 450px;
+        height: 100vh;
+        max-height: 900px;
+        border: 5px solid #4a2e1b;
+        outline: 2px solid #8b5e3c;
+        outline-offset: -7px;
+        box-shadow: 8px 8px 0 #1a0a00, 0 0 0 7px #4a2e1b;
+        background: #1c0e05;
+      }
+
+      /* ── Top banner ───────────────────────────────────────── */
+      #topbar {
+        background: linear-gradient(
+          180deg,
+          #fff8e7 0%,
+          #f0e0b0 55%,
+          #e8d08a 100%
+        );
+        color: #2a1a0a;
+        padding: 0 10px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        border-bottom: 4px solid #4a2e1b;
+        box-shadow: 0 3px 0 #8b5e3c inset, 0 -1px 0 #c8a050 inset;
+        font-size: 6px;
+        height: 34px;
+        flex-shrink: 0;
+      }
+      #title {
+        color: #7b1c00;
+        font-size: 8px;
+        flex: 1;
+        text-align: center;
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 0 #f0c060, 2px 2px 0 #4a2e1b;
+      }
+      .res-item {
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        padding: 2px 6px 2px 5px;
+        border: 2px solid #4a2e1b;
+        border-radius: 2px;
+        font-size: 5px;
+        white-space: nowrap;
+        box-shadow: 2px 2px 0 #2a1a0a;
+        line-height: 1;
+      }
+      .res-val {
+        font-size: 5px;
+        min-width: 22px;
+      }
+      .ri-gold {
+        background: #f0c030;
+        color: #2a1a0a;
+      }
+      .ri-gold .res-val {
+        color: #7b1c00;
+      }
+
+      /* ── Game canvas container ────────────────────────────── */
+      #game-canvas {
+        flex: 1;
+        width: 100%;
+        min-height: 0;
+        background: #1c0e05;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+      }
+      #game-canvas canvas {
+        display: block;
+      }
+
+      /* ── Bottom bar ───────────────────────────────────────── */
+      #bottombar {
+        background: linear-gradient(180deg, #e8d09a 0%, #c8a050 100%);
+        padding: 3px 10px;
+        font-size: 5px;
+        color: #4a2e1b;
+        border-top: 3px solid #4a2e1b;
+        display: flex;
+        gap: 14px;
+        height: 24px;
+        align-items: center;
+        flex-shrink: 0;
+        box-shadow: inset 0 2px 0 #f0d880;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="topbar">
+        <span id="title">⚔ ADVENTURE KINGDOM ⚔</span>
+        <div class="res-item ri-gold">
+          💰<span class="res-val" id="res-gold">99999</span>
+        </div>
+      </div>
+
+      <!-- Phaser injects its canvas here -->
+      <div id="game-canvas"></div>
+
+      <div id="bottombar">
+        <span>Drag to pan</span>
+        <span>Tap tile for grid coords</span>
+      </div>
+    </div>
+
+    <script type="module" src="src/engine/main.js"></script>
+  </body>
+</html>
